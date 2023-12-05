@@ -24,6 +24,7 @@ class UpdatePostRequest extends FormRequest
         return [
             'post_content' => ['required', 'string'],
             'post_image' => ['nullable', 'image', 'mimes:png,jpg,jpeg, svg', 'max:2048'],
+            'views_count' => ['integer', 'min:0',]
         ];
     }
 }

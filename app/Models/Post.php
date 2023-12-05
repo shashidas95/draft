@@ -10,14 +10,19 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class Post extends Model
 {
     use HasFactory;
-    protected $fillable = ['post_content', 'post_image', 'user_id',];
+    protected $fillable = ['post_content', 'post_image', 'user_id', 'views_count'];
 
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
     public function comments()
     {
         return $this->hasMany(Comment::class);
     }
-    public function user()
+    public function likes()
     {
-        return $this->belongsTo(User::class);
+        return $this->hasMany(Like::class);
     }
 }

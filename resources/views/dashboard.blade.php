@@ -1,4 +1,5 @@
 <x-app-layout>
+
     <main class="container max-w-xl mx-auto space-y-8 mt-8 px-2 md:px-0 min-h-screen">
         <!-- Barta Create Post Card -->
         <form method="POST" enctype="multipart/form-data"
@@ -110,9 +111,13 @@
                                             <a href="#"
                                                 class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                                                 role="menuitem" tabindex="-1" id="user-menu-item-0">Edit</a>
-                                            <a href="#"
-                                                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                                role="menuitem" tabindex="-1" id="user-menu-item-1">Delete</a>
+                                            <form action="{{ route('posts.destroy', $post->id) }}">
+                                                @method('delete')
+                                                @csrf
+                                                <button type="submit"
+                                                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                                    role="menuitem" tabindex="-1" id="user-menu-item-1">Delete</button>
+                                            </form>
                                         </div>
                                     </div>
                                 </div>
@@ -121,19 +126,24 @@
                         </header>
                         <!-- Content -->
                         <div class="py-4 text-gray-700 font-normal space-y-2">
-                            @if ($post->post_image)
-                                <img src="{{ asset('storage/images/' . $post->post_image) }}"
-                                    class="min-h-auto w-full rounded-lg object-cover max-h-64 md:max-h-72" alt="" />
-                            @else
-                                <p>No Image Found</p>
-                            @endif
-                            <p> {{ $post->post_content }}</p>
+                            <a href="{{ route('posts.show', $post->id) }}">
+                                @if ($post->post_image)
+                                    <img src="{{ asset('storage/images/' . $post->post_image) }}"
+                                        class="min-h-auto w-full rounded-lg object-cover max-h-64 md:max-h-72"
+                                        alt="" />
+                                @else
+                                    <p>No Image Found</p>
+                                @endif
+                                <p> {{ $post->post_content }}</p>
+                            </a>
                         </div>
                         <!-- Date Created & View Stat -->
                         <div class="flex items-center gap-2 text-gray-500 text-xs my-2">
                             <span class="">{{ $post->created_at }}</span>
                             <span class="">•</span>
-                            <span> views</span>
+                            <span>
+                                {{ $post->views_count }} views
+                            </span>
                         </div>
                         <!-- Barta Card Bottom -->
                         <footer class="border-t border-gray-200 pt-2">
@@ -141,23 +151,30 @@
                             <div class="flex items-center justify-between">
                                 <div class="flex gap-8 text-gray-600">
                                     <!-- Heart Button -->
-                                    <button type="button"
-                                        class="-m-2 flex gap-2 text-xs items-center rounded-full p-2 text-gray-600 hover:text-gray-800">
-                                        <span class="sr-only">Like</span>
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                            stroke-width="2" stroke="currentColor" class="w-5 h-5">
-                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
-                                        </svg>
+                                    <form action="{{ route('likes.store', $post->id) }}" method="post">
+                                        @csrf
+                                        <input type="hidden" name="post_id" value="{{ $post->id }}">
+                                        <button type="submit"
+                                            class="-m-2 flex gap-2 text-xs items-center rounded-full p-2 text-gray-600 hover:text-gray-800">
+                                            <span class="sr-only">Like</span>
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                    d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
+                                            </svg>
+                                            <p>{{ $post->likes_count }}</p>
+                                        </button>
 
-                                        <p></p>
-                                    </button>
+                                    </form>
+
+
                                     <!-- /Heart Button -->
                                     <!-- Comment Button -->
+
                                     <button type="button"
                                         class="-m-2 flex gap-2 text-xs items-center rounded-full p-2 text-gray-600 hover:text-gray-800">
-                                        <span class="sr-only">{{ $countComment }}Comment</span>
-                                        <p>{{ $countComment }}</p>
+                                        <span class="sr-only">{{ $post->comments_count }}Comment</span>
+                                        <p>{{ $post->comments_count }}</p>
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                             stroke-width="2" stroke="currentColor" class="w-5 h-5">
                                             <path stroke-linecap="round" stroke-linejoin="round"
@@ -186,7 +203,7 @@
                         </footer>
                         <!-- /Barta Card Bottom -->
                         {{-- < class="w-full bg-white rounded-lg border p-2 my-4 mx-6"> --}}
-                        @foreach ($comments as $comment)
+                        @foreach ($post->comments as $comment)
                             <div class="flex flex-col">
                                 <div class="border rounded-md p-3 ml-3 my-3">
                                     <div class="flex gap-3 items-center">

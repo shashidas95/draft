@@ -8,7 +8,9 @@ use App\Models\Comment;
 use Illuminate\Http\Request;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\File;
 use App\Http\Requests\StorePostRequest;
+use Illuminate\Support\Facades\Session;
 use App\Http\Requests\UpdatePostRequest;
 
 class PostController extends Controller
@@ -18,10 +20,8 @@ class PostController extends Controller
      */
     public function index()
     {
-        $posts = Post::with('user')->get();
-        $comments = Comment::with('user')->get();
-        $countComment =Comment::with('post')->count();
-        return view('dashboard', compact('posts', 'comments', 'countComment'));
+        $posts = Post::with('user')->withCount('comments', 'likes')->get();
+        return view('dashboard', compact('posts'));
     }
 
     /**
@@ -56,7 +56,12 @@ class PostController extends Controller
      */
     public function show(Post $post)
     {
-        //
+        // dd($post->id);
+        if (!Session::has('viewed_posts.' . $post->id)) {
+            $post->increment('views_count');
+            Session::put('viewed_posts.' . $post->id, true);
+        }
+        return view('posts.show', compact('post'));
     }
 
     /**
@@ -78,8 +83,41 @@ class PostController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Post $post)
+    // public function destroy(Post $post)
+    // {
+    //     // dd($post);
+    //     $post->delete();
+    //     return redirect()->route('dashboard')->with('success', "deleted post successfully");
+    // }
+    //     public static function UnlinkImage($filepath, $fileName)
+    //     {
+    //         $old_image = $filepath . $fileName;
+    //         if (file_exists($old_image)) {
+    //             @unlink($old_image);
+    //         }
+    //     }
+    //     $image_path = "the name of your image path here/".$request->Image;
+    //  $image_path         = public_path("\storage\images\\") .$post->post_image;
+
+    //  if (file_exists($image_path)) {
+
+    //        @unlink($image_path);
+
+    //    }
+    public function destroy($id)
     {
-        // $post = Post::find($id);
+        $post             = Post::findOrFail($id);
+        $image_path         = public_path("\storage\images\\") . $post->post_image;
+
+        if (File::exists($image_path)) {
+            File::delete($image_path);
+        } else {
+            $post->delete();
+            //abort(404);
+        }
+
+        $post->delete();
+
+        return redirect()->route('dashboard')->with('success', "deleted post successfully");
     }
 }

@@ -2,6 +2,7 @@
 
 use App\Models\Post;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\LikeController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\ProfileController;
@@ -37,6 +38,9 @@ Route::middleware('auth')->group(function () {
 });
 Route::resource('posts', PostController::class)->only(['index', 'show']);
 Route::resource('comments', CommentController::class)->only(['index', 'show']);
+// Route::resource('likes', LikeController::class)->only(['store']);
+
+Route::post('/likes/{id}', [LikeController::class, 'store'])->name('likes.store');
 
 
 require __DIR__ . '/auth.php';
