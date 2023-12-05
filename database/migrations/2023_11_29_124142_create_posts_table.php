@@ -16,10 +16,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->text('post_content');
             $table->string('post_image')->nullable();
-            $table->unsignedInteger('post_views')->default(0);
-            $table->unsignedInteger('likes')->default(0);
-            $table->unsignedInteger('unlikes')->default(0);
-            $table->unsignedInteger('comments')->default(0);
+            $table->timestamps();
         });
     }
 

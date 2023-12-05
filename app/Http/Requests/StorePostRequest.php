@@ -23,13 +23,7 @@ class StorePostRequest extends FormRequest
     {
         return [
             'post_content' => ['required', 'string'],
-            'post_views' => ['nullable', 'string'],
-            'likes' => ['nullable', 'string'],
-            'comments' => ['nullable', 'string'],
-            'unlikes' => ['nullable', 'string'],
-            'post_image' => ['nullable', 'image', 'mimes:png,jpg,jpeg, svg'],
-
-            'user_id' => ['required', 'exists:users']
+            'post_image' => ['nullable', 'image', 'mimes:png,jpg,jpeg,svg', 'max:2048'],
         ];
     }
 }

@@ -11,12 +11,7 @@ class Post extends Model
 {
     use HasFactory;
     protected $fillable = ['post_content', 'post_image', 'user_id',];
-    protected $attributes = [
-        'comments' => '0',
-        'post_views' => '0',
-        'likes' => '0',
-        'unlikes' => '0',
-    ];
+
     public function comments()
     {
         return $this->hasMany(Comment::class);

@@ -3,7 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
+use App\Models\User;
+use App\Models\Comment;
 use Illuminate\Http\Request;
+use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\StorePostRequest;
 use App\Http\Requests\UpdatePostRequest;
 
@@ -14,7 +18,10 @@ class PostController extends Controller
      */
     public function index()
     {
-        //
+        $posts = Post::with('user')->get();
+        $comments = Comment::with('user')->get();
+        $countComment =Comment::with('post')->count();
+        return view('dashboard', compact('posts', 'comments', 'countComment'));
     }
 
     /**
@@ -30,18 +37,19 @@ class PostController extends Controller
      */
     public function store(StorePostRequest $request)
     {
-        $request->validated();
-
-        $post = Post::create([
-            'user_id' => $request->user_id,
-            'post_content' => $request->name,
-            'post_image' => $imageName,
+        $validated = $request->validated();
+        if ($request->hasFile('post_image')) {
+            $imageName = time() . '.' . $request->post_image->extension();
+            $request->post_image->storeAs('public/images', $imageName);
+        }
+        $posts = auth()->user()->posts()->create([
+            'post_content' =>
+            $validated['post_content'],
+            'post_image' => $imageName ?? null,
         ]);
-
-        $post->save();
-
-        return redirect('/posts');
+        return redirect()->route('dashboard')->with('success', "created post successfully");
     }
+
 
     /**
      * Display the specified resource.
@@ -72,6 +80,6 @@ class PostController extends Controller
      */
     public function destroy(Post $post)
     {
-        //
+        // $post = Post::find($id);
     }
 }

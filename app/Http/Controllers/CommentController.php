@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Post;
 use App\Models\Comment;
+use Illuminate\Http\Request;
 use App\Http\Requests\StoreCommentRequest;
 use App\Http\Requests\UpdateCommentRequest;
 
@@ -13,23 +15,33 @@ class CommentController extends Controller
      */
     public function index()
     {
-        //
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(StoreCommentRequest $request)
     {
-        //
+        //  dd($request->id);
+        // dd($request);
+
+        $validated = $request->validated();
+
+
+        //    $comments= Comment::create([
+        //         // 'comment_content' => $validated['comment_content'],
+        //         'comment_content' => $request->comment_content,
+        //         'post_id' => $request->id,
+        //         'user_id' => auth()->user()->id,
+        //     ]);
+
+
+        $comments = auth()->user()->comments()->create(
+            [
+                'comment_content' =>  $validated['comment_content'],
+                'post_id' => $request->id,
+                'user_id' => auth()->user()->id,
+            ]
+        );
+        return redirect('dashboard')->with('success', "commented successfully");
     }
 
     /**
