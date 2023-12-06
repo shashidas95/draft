@@ -20,8 +20,20 @@ class PostController extends Controller
      */
     public function index()
     {
+        // dd(request()->all());
+        $usersQuery = User::query();
+
+        if (request()->has('search')) {
+            $searchTerm = '%' . request()->get('search', '') . '%';
+            $usersQuery->where('username', 'like', $searchTerm)
+                ->orWhere('name', 'like', $searchTerm)
+                ->orWhere('email', 'like', $searchTerm);
+        }
+
+        $userInfo = $usersQuery->get();
+    
         $posts = Post::with('user')->withCount('comments', 'likes')->get();
-        return view('dashboard', compact('posts'));
+        return view('dashboard', compact('posts', 'userInfo'));
     }
     /**
      * Store a newly created resource in storage.
