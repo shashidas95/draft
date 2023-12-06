@@ -23,15 +23,6 @@ class PostController extends Controller
         $posts = Post::with('user')->withCount('comments', 'likes')->get();
         return view('dashboard', compact('posts'));
     }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
     /**
      * Store a newly created resource in storage.
      */
@@ -49,8 +40,6 @@ class PostController extends Controller
         ]);
         return redirect()->route('dashboard')->with('success', "created post successfully");
     }
-
-
     /**
      * Display the specified resource.
      */
@@ -69,7 +58,7 @@ class PostController extends Controller
      */
     public function edit(Post $post)
     {
-        //
+        return view('posts.edit', compact('post'));
     }
 
     /**
@@ -77,47 +66,30 @@ class PostController extends Controller
      */
     public function update(UpdatePostRequest $request, Post $post)
     {
-        //
+        $validated = $request->validated();
+        if ($request->hasFile('post_image')) {
+            $image_path = public_path("\storage\images\\") . $post->post_image;
+            if (File::exists($image_path)) {
+                File::delete($image_path);
+            }
+            $imageName = time() . '.' . $request->post_image->extension();
+            $request->post_image->storeAs('public/images', $imageName);
+        }
+        auth()->user()->posts()->update([
+            'post_content' =>
+            $validated['post_content'],
+            'post_image' => $imageName ?? null,
+        ]);
+        return redirect()->route('dashboard')->with('success', "Updated post successfully");
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    // public function destroy(Post $post)
-    // {
-    //     // dd($post);
-    //     $post->delete();
-    //     return redirect()->route('dashboard')->with('success', "deleted post successfully");
-    // }
-    //     public static function UnlinkImage($filepath, $fileName)
-    //     {
-    //         $old_image = $filepath . $fileName;
-    //         if (file_exists($old_image)) {
-    //             @unlink($old_image);
-    //         }
-    //     }
-    //     $image_path = "the name of your image path here/".$request->Image;
-    //  $image_path         = public_path("\storage\images\\") .$post->post_image;
-
-    //  if (file_exists($image_path)) {
-
-    //        @unlink($image_path);
-
-    //    }
-    public function destroy($id)
+    public function destroy(Post $post)
     {
-        $post             = Post::findOrFail($id);
-        $image_path         = public_path("\storage\images\\") . $post->post_image;
-
+        $image_path = public_path("\storage\images\\") . $post->post_image;
         if (File::exists($image_path)) {
             File::delete($image_path);
-        } else {
-            $post->delete();
-            //abort(404);
         }
-
         $post->delete();
-
         return redirect()->route('dashboard')->with('success', "deleted post successfully");
     }
 }

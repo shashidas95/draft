@@ -21,11 +21,6 @@ use App\Http\Controllers\ProfileController;
 Route::get('/', function () {
     return view('welcome');
 });
-// Route::get('/p', function () {
-//     $posts = Post::with('user')->get();
-//     return view('welcome', ['posts' => $posts]);
-// });
-
 
 Route::get('/dashboard', [PostController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 
