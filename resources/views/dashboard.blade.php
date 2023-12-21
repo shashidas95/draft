@@ -2,11 +2,11 @@
     <!-- search button -->
 
     {{-- {{ dd($userInfo) }} --}}
-    @foreach ($userInfo as $userInfo1)
+    {{-- @foreach ($userInfo as $userInfo1)
         <p>{{ $userInfo1->username }}</p>
         <p>{{ $userInfo1->name }}</p>
         <p>{{ $userInfo1->email }}</p>
-    @endforeach
+    @endforeach --}}
 
     <form action="{{ route('dashboard') }}" method="get">
         <div class="flex items-center max-w-md mx-auto bg-white rounded-lg " x-data="{ search: '' }">
