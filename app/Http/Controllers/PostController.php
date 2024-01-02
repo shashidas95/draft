@@ -5,10 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\Post;
 use App\Models\User;
 use App\Models\Comment;
+use App\Mail\NewPostEmail;
 use Illuminate\Http\Request;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Mail;
 use App\Http\Requests\StorePostRequest;
 use Illuminate\Support\Facades\Session;
 use App\Http\Requests\UpdatePostRequest;
@@ -53,6 +55,10 @@ class PostController extends Controller
             $validated['post_content'],
             'post_image' => $imageName ?? null,
         ]);
+        Mail::to(auth()->user()->email)->send(new NewPostEmail(
+            [auth()->user()->username]
+        ));
+
         return redirect()->route('dashboard')->with('success', "created post successfully");
     }
     /**
